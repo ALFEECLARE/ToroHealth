@@ -1,10 +1,12 @@
 package net.torocraft.torohealth.display;
 
+import org.joml.Quaternionf;
+
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -82,8 +84,8 @@ public class EntityDisplay {
     matrixStack2.pushPose();
     matrixStack2.translate(0.0D, 0.0D, 1000.0D);
     matrixStack2.scale((float) size, (float) size, (float) size);
-    Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
-    Quaternion quaternion2 = Vector3f.XP.rotationDegrees(g * 20.0F);
+    Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
+    Quaternionf quaternion2 = Axis.XP.rotationDegrees(g * 20.0F);
     quaternion.mul(quaternion2);
     matrixStack2.mulPose(quaternion);
     float h = entity.yBodyRot; // bodyYaw;
@@ -99,7 +101,7 @@ public class EntityDisplay {
     Lighting.setupForEntityInInventory();
     EntityRenderDispatcher entityrenderdispatcher =
         Minecraft.getInstance().getEntityRenderDispatcher();
-    quaternion2.conj();
+    quaternion2.conjugate();
     entityrenderdispatcher.overrideCameraOrientation(quaternion2);
     entityrenderdispatcher.setRenderShadow(false);
     MultiBufferSource.BufferSource immediate =

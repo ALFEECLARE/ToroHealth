@@ -1,6 +1,7 @@
 package net.torocraft.torohealth.util;
 
 import java.util.function.Predicate;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -108,8 +109,9 @@ public class RayTrace implements BlockGetter {
       return this.clipWithInteractionOverride(c.getFrom(), c.getTo(), pos, voxelshape, block);
     }, (c) -> {
       Vec3 vec3 = c.getFrom().subtract(c.getTo());
+      Vec3 toBlock = c.getTo();
       return BlockHitResult.miss(c.getTo(), Direction.getNearest(vec3.x, vec3.y, vec3.z),
-          new BlockPos(c.getTo()));
+          new BlockPos(Mth.floor(toBlock.x),Mth.floor(toBlock.y),Mth.floor(toBlock.z)));
     });
   }
 
