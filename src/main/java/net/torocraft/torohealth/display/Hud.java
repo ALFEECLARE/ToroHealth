@@ -1,35 +1,35 @@
 package net.torocraft.torohealth.display;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.torocraft.torohealth.ToroHealth;
 import net.torocraft.torohealth.config.Config;
 import net.torocraft.torohealth.config.Config.AnchorPoint;
 
-import java.awt.*;
-
-public class Hud extends Screen {
+public class Hud implements IGuiOverlay {
   private static final ResourceLocation BACKGROUND_TEXTURE =
       new ResourceLocation(ToroHealth.MODID + ":textures/gui/default_skin_basic.png");
   private EntityDisplay entityDisplay = new EntityDisplay();
+  private Minecraft minecraft;
   private LivingEntity entity;
   private BarDisplay barDisplay;
   private Config config = new Config();
   private int age;
 
   public Hud() {
-    super(Component.literal("ToroHealth HUD"));
     this.minecraft = Minecraft.getInstance();
-    barDisplay = new BarDisplay(Minecraft.getInstance(), this);
+    barDisplay = new BarDisplay(Minecraft.getInstance());
   }
 
-  public void draw(ForgeGui gui, PoseStack poseStack, float partialTick, int width, int height) {
+  public void render(ForgeGui gui,GuiGraphics guigraphics, float partialTick, int width, int height) {
+	gui.setTitle(Component.literal("ToroHealth HUD"));
     if (this.minecraft.options.renderDebug) {
       return;
     }
@@ -39,7 +39,7 @@ public class Hud extends Screen {
     }
     float x = determineX();
     float y = determineY();
-    draw(poseStack, x, y, config.hud.scale);
+    draw(guigraphics, x, y, config.hud.scale);
   }
 
   private float determineX() {
@@ -101,7 +101,7 @@ public class Hud extends Screen {
     return entity;
   }
 
-  private void draw(PoseStack matrix, float x, float y, float scale) {
+  private void draw(GuiGraphics gui,float x, float y, float scale) {
     if (entity == null) {
       return;
     }
@@ -110,27 +110,27 @@ public class Hud extends Screen {
       return;
     }
 
-    matrix.pushPose();
-    matrix.scale(scale, scale, scale);
-    matrix.translate(x - 10, y - 10, 0);
+    gui.pose().pushPose();
+    gui.pose().scale(scale, scale, scale);
+    gui.pose().translate(x - 10, y - 10, 0);
     if (config.hud.showSkin) {
-      this.drawSkin(matrix);
+      this.drawSkin(gui);
     }
-    matrix.translate(10, 10, 0);
+    gui.pose().translate(10, 10, 0);
     if (config.hud.showEntity) {
-      entityDisplay.draw(matrix, scale);
+      entityDisplay.draw(gui.pose(), scale);
     }
-    matrix.translate(44, 0, 0);
+    gui.pose().translate(44, 0, 0);
     if (config.hud.showBar) {
-      barDisplay.draw(matrix, entity);
+      barDisplay.draw(gui, entity);
     }
-    matrix.popPose();
+    gui.pose().popPose();
+    gui.flush();
   }
 
-  private void drawSkin(PoseStack matrix) {
-    RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
+  private void drawSkin(GuiGraphics gui) {
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     int w = 160, h = 60;
-    blit(matrix, 0, 0, 0.0f, 0.0f, w, h, w, h);
+    gui.blit(BACKGROUND_TEXTURE, 0, 0, 0.0f, 0.0f, w, h, w, h);
   }
 }

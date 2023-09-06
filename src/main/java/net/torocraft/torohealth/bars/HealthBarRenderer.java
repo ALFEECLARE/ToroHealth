@@ -9,13 +9,13 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -74,7 +74,7 @@ public class HealthBarRenderer {
 
   }
 
-  public static void renderInWorld(float partialTick, PoseStack matrix, Camera camera) {
+  public static void renderInWorld(float partialTick, GuiGraphics gui, Camera camera) {
 
     Minecraft client = Minecraft.getInstance();
 
@@ -111,15 +111,16 @@ public class HealthBarRenderer {
       double camY = camPos.y();
       double camZ = camPos.z();
 
-      matrix.pushPose();
-      matrix.translate(x - camX, (y + height) - camY, z - camZ);
-      matrix.mulPose(Axis.YP.rotationDegrees(-camera.getYRot()));
-      matrix.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
-      matrix.scale(-scaleToGui, -scaleToGui, scaleToGui);
+      gui.pose().pushPose();
+      gui.pose().translate(x - camX, (y + height) - camY, z - camZ);
+      gui.pose().mulPose(Axis.YP.rotationDegrees(-camera.getYRot()));
+      gui.pose().mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
+      gui.pose().scale(-scaleToGui, -scaleToGui, scaleToGui);
 
-      render(matrix, entity, 0, 0, FULL_SIZE, true);
+      render(gui, entity, 0, 0, FULL_SIZE, true);
 
-      matrix.popPose();
+      gui.pose().popPose();
+      gui.flush();
     }
 
     RenderSystem.disableBlend();
@@ -127,7 +128,7 @@ public class HealthBarRenderer {
     renderedEntities.clear();
   }
 
-  public static void render(PoseStack matrix, LivingEntity entity, double x, double y,
+  public static void render(GuiGraphics gui, LivingEntity entity, double x, double y,
       float width, boolean inWorld) {
 
     Relation relation = EntityUtil.determineRelation(entity);
@@ -143,21 +144,22 @@ public class HealthBarRenderer {
     float percent2 = Math.min(state.previousHealthDisplay, entity.getMaxHealth()) / entity.getMaxHealth();
     int zOffset = 0;
 
-    Matrix4f m4f = matrix.last().pose();
+    Matrix4f m4f = gui.pose().last().pose();
     drawBar(m4f, x, y, width, 1, DARK_GRAY, zOffset++, inWorld);
     drawBar(m4f, x, y, width, percent2, color2, zOffset++, inWorld);
     drawBar(m4f, x, y, width, percent, color, zOffset, inWorld);
+    gui.flush();
 
     if (!inWorld) {
       if (ToroHealth.CONFIG.bar.damageNumberType.equals(Config.NumberType.CUMULATIVE)) {
-        drawDamageNumber(matrix, state.lastDmgCumulative, x, y, width);
+        drawDamageNumber(gui, state.lastDmgCumulative, x, y, width);
       } else if (ToroHealth.CONFIG.bar.damageNumberType.equals(Config.NumberType.LAST)) {
-        drawDamageNumber(matrix, state.lastDmg, x, y, width);
+        drawDamageNumber(gui, state.lastDmg, x, y, width);
       }
     }
   }
 
-  public static void drawDamageNumber(PoseStack matrix, int dmg, double x, double y,
+  public static void drawDamageNumber(GuiGraphics gui, int dmg, double x, double y,
       float width) {
     int i = Math.abs(Math.round(dmg));
     if (i == 0) {
@@ -167,7 +169,8 @@ public class HealthBarRenderer {
     Minecraft minecraft = Minecraft.getInstance();
     int sw = minecraft.font.width(s);
     int color = dmg < 0 ? ToroHealth.CONFIG.particle.healColor : ToroHealth.CONFIG.particle.damageColor;
-    minecraft.font.draw(matrix, s, (int) (x + (width / 2) - sw), (int) y + 5, color);
+    gui.drawString(minecraft.font, s, (int) (x + (width / 2) - sw), (int) y + 5, color);
+    gui.flush();
   }
 
   private static void drawBar(Matrix4f matrix4f, double x, double y, float width, float percent,
@@ -207,5 +210,7 @@ public class HealthBarRenderer {
     buffer.vertex(matrix4f, (float) (-half + size + x), (float) y, zOffset * zOffsetAmount)
         .uv(((u + uw) * c), v * c).endVertex();
     tessellator.end();
+    RenderSystem.setShaderColor(1, 1, 1, 1);
+    RenderSystem.disableBlend();
   }
 }
