@@ -31,3 +31,8 @@ run/
 
 *.7z
 logs
+/caches/*
+/daemon/*
+/native/*
+/wrapper/*
+/.tmp/*
