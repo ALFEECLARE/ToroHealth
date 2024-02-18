@@ -1,5 +1,7 @@
 package net.torocraft.torohealth.display;
 
+import java.util.List;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.Minecraft;
@@ -12,11 +14,16 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.torocraft.torohealth.ToroHealth;
 import net.torocraft.torohealth.config.Config;
 import net.torocraft.torohealth.config.Config.AnchorPoint;
+import net.torocraft.torohealth.util.EntityUtil;
 
 public class Hud implements IGuiOverlay {
   private static final ResourceLocation BACKGROUND_TEXTURE =
       new ResourceLocation(ToroHealth.MODID + ":textures/gui/default_skin_basic.png");
   private EntityDisplay entityDisplay = new EntityDisplay();
+  private int BASE_X_OFFSET = -10;
+  private int BASE_Y_OFFSET = -10;
+  private int DRAW_AREA_WIDTH = BarDisplay.BAR_OFFSET_X + BarDisplay.BAR_WIDTH + BASE_X_OFFSET;
+  private int DRAW_AREA_HEIGHT = 60 + BASE_Y_OFFSET;
   private Minecraft minecraft;
   private LivingEntity entity;
   private BarDisplay barDisplay;
@@ -30,47 +37,50 @@ public class Hud implements IGuiOverlay {
 
   public void render(ForgeGui gui,GuiGraphics guigraphics, float partialTick, int width, int height) {
 	gui.setTitle(Component.literal("ToroHealth HUD"));
-    if (this.minecraft.options.renderDebug) {
+    if (this.minecraft.gui.getDebugOverlay().showDebugScreen()) {
       return;
     }
     this.config = ToroHealth.CONFIG;
     if (this.config == null) {
       this.config = new Config();
     }
-    float x = determineX();
-    float y = determineY();
-    draw(guigraphics, x, y, config.hud.scale);
+    float scale = config.hud.scale;
+    List<String> extraDataList = EntityUtil.getEntityExtraDataList(entity, minecraft);
+    float x = determineX(scale);
+    float y = determineY(scale, extraDataList);
+    draw(guigraphics, x, y, scale, extraDataList);
   }
 
-  private float determineX() {
+  private float determineX(float scale) {
     float x = config.hud.x;
     AnchorPoint anchor = config.hud.anchorPoint;
-    float wScreen = minecraft.getWindow().getGuiScaledHeight();
+    float wScreen = minecraft.getWindow().getGuiScaledWidth();
 
     switch (anchor) {
       case BOTTOM_CENTER:
       case TOP_CENTER:
-        return (wScreen / 2) + x;
+        return (wScreen / scale - DRAW_AREA_WIDTH) / 2 - x;
       case BOTTOM_RIGHT:
       case TOP_RIGHT:
-        return (wScreen) + x;
+        return (wScreen) / scale - DRAW_AREA_WIDTH  - x;
       default:
-        return x;
+        return BASE_X_OFFSET + x;
     }
   }
 
-  private float determineY() {
+  private float determineY(float scale, List<String> extraDataList) {
     float y = config.hud.y;
     AnchorPoint anchor = config.hud.anchorPoint;
     float hScreen = minecraft.getWindow().getGuiScaledHeight();
-
+    int actualDrawAreaHeight = Math.max(DRAW_AREA_HEIGHT, minecraft.font.lineHeight * extraDataList.size() + BarDisplay.EXTRADATA_Y_BASE_OFFSET - BASE_Y_OFFSET);
+    
     switch (anchor) {
       case BOTTOM_CENTER:
       case BOTTOM_LEFT:
       case BOTTOM_RIGHT:
-        return y + hScreen;
+          return (hScreen) / scale - actualDrawAreaHeight - y;
       default:
-        return y;
+        return BASE_Y_OFFSET + y;
     }
   }
 
@@ -101,7 +111,7 @@ public class Hud implements IGuiOverlay {
     return entity;
   }
 
-  private void draw(GuiGraphics gui,float x, float y, float scale) {
+  private void draw(GuiGraphics gui,float x, float y, float scale, List<String> extraDataList) {
     if (entity == null) {
       return;
     }
@@ -112,7 +122,7 @@ public class Hud implements IGuiOverlay {
 
     gui.pose().pushPose();
     gui.pose().scale(scale, scale, scale);
-    gui.pose().translate(x - 10, y - 10, 0);
+    gui.pose().translate(x, y, 0);
     if (config.hud.showSkin) {
       this.drawSkin(gui);
     }
@@ -134,3 +144,4 @@ public class Hud implements IGuiOverlay {
     gui.blit(BACKGROUND_TEXTURE, 0, 0, 0.0f, 0.0f, w, h, w, h);
   }
 }
+
