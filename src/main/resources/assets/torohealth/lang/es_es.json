@@ -17,5 +17,22 @@
   "config.torohealth.red": "Rojo",
   "config.torohealth.green": "Verde",
   "config.torohealth.blue": "Azul",
-  "config.torohealth.alpha": "Transparencia"
+  "config.torohealth.alpha": "Transparencia",
+  
+  "net.torocraft.torohealth.horse.speed": "Speed",
+  "net.torocraft.torohealth.horse.jumppower": "Jump",
+  "net.torocraft.torohealth.horse.maxhealth": "Max Health",
+  "net.torocraft.torohealth.horse.inventory": "Inventory",
+  "net.torocraft.torohealth.goat.normal": "Normal Goat",
+  "net.torocraft.torohealth.goat.scream": "Screaming Goat",
+  "net.torocraft.torohealth.panda.maingene": "Main Gene",
+  "net.torocraft.torohealth.panda.hiddengene": "Hidden Gene",
+  "net.torocraft.torohealth.panda.finallygene": "Fore Gene",
+  "net.torocraft.torohealth.panda.gene.NORMAL": "Normal",
+  "net.torocraft.torohealth.panda.gene.LAZY": "Lazy",
+  "net.torocraft.torohealth.panda.gene.WORRIED": "Worried",
+  "net.torocraft.torohealth.panda.gene.PLAYFUL": "Playful",
+  "net.torocraft.torohealth.panda.gene.BROWN": "Brown",
+  "net.torocraft.torohealth.panda.gene.WEAK": "Weak",
+  "net.torocraft.torohealth.panda.gene.AGGRESSIVE": "Aggressive"
 }

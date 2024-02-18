@@ -1,6 +1,7 @@
 package net.torocraft.torohealth.config;
 
 import com.google.gson.annotations.JsonAdapter;
+
 import net.torocraft.torohealth.config.loader.ColorJsonAdpater;
 import net.torocraft.torohealth.config.loader.IConfig;
 
@@ -15,6 +16,10 @@ public class Config implements IConfig {
 
   public enum AnchorPoint {
     TOP_LEFT, TOP_CENTER, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT
+  }
+
+  public enum DataViewType {
+	NONE, MINMAX, PERCENTAGE
   }
 
   public boolean watchForChanges = true;
@@ -34,6 +39,8 @@ public class Config implements IConfig {
     public boolean showBar = true;
     public boolean showSkin = true;
     public boolean onlyWhenHurt = false;
+    public boolean showExtraData = true;
+    public DataViewType showDataType = DataViewType.MINMAX;
   }
 
   public static class Particle {
