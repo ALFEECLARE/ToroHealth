@@ -6,7 +6,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
@@ -36,7 +35,7 @@ public class Hud implements IGuiOverlay {
   }
 
   public void render(ForgeGui gui,GuiGraphics guigraphics, float partialTick, int width, int height) {
-	gui.setTitle(Component.literal("ToroHealth HUD"));
+	//gui.setTitle(Component.literal("ToroHealth HUD"));
     if (this.minecraft.options.renderDebug) {
       return;
     }
