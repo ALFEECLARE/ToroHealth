@@ -34,5 +34,6 @@
   "net.torocraft.torohealth.panda.gene.PLAYFUL": "Playful",
   "net.torocraft.torohealth.panda.gene.BROWN": "Brown",
   "net.torocraft.torohealth.panda.gene.WEAK": "Weak",
-  "net.torocraft.torohealth.panda.gene.AGGRESSIVE": "Aggressive"
+  "net.torocraft.torohealth.panda.gene.AGGRESSIVE": "Aggressive",
+  "net.torocraft.torohealth.villagerBiome": "Biome"
 }
