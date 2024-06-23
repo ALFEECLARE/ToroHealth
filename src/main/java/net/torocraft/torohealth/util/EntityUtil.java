@@ -77,6 +77,9 @@ public class EntityUtil {
 
 	public static List<String> getEntityExtraDataList(LivingEntity entity, Minecraft mc) {
 		List<String> answer = new ArrayList<String>();
+		if (entity == null) {
+			return answer;
+		}
 		if (entity instanceof AbstractHorse) {
 			AbstractHorse horseEntity = (AbstractHorse)entity;
 			answer.addAll(getHorseExtraData(horseEntity));
