@@ -1,6 +1,7 @@
 package net.torocraft.torohealth.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -157,4 +158,9 @@ public class EntityUtil {
 			return "";
 		}
 	}
+	
+	public static List<String> getIgnoreEntityList(String entityKeyString) {
+		return Arrays.asList(entityKeyString.split(","));
+	}
+	
 }

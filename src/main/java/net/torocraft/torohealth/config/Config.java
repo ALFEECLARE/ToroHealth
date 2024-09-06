@@ -2,6 +2,7 @@ package net.torocraft.torohealth.config;
 
 import com.google.gson.annotations.JsonAdapter;
 
+import net.torocraft.torohealth.ToroHealth;
 import net.torocraft.torohealth.config.loader.ColorJsonAdpater;
 import net.torocraft.torohealth.config.loader.IConfig;
 
@@ -41,6 +42,7 @@ public class Config implements IConfig {
     public boolean onlyWhenHurt = false;
     public boolean showExtraData = true;
     public DataViewType showDataType = DataViewType.MINMAX;
+    public String ignoreEntity = "";
   }
 
   public static class Particle {
@@ -70,11 +72,13 @@ public class Config implements IConfig {
     public float distance = 60f;
     public boolean onlyWhenLookingAt = false;
     public boolean onlyWhenHurt = false;
+    public String ignoreEntity = "";
   }
 
   @Override
   public void update() {
     particle.distanceSquared = particle.distance * particle.distance;
+    ToroHealth.HUD.updateIgnoreList(this.hud.ignoreEntity,this.inWorld.ignoreEntity);
   }
 
   @Override

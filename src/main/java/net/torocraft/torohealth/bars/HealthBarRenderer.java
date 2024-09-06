@@ -25,6 +25,7 @@ import net.torocraft.torohealth.ToroHealth;
 import net.torocraft.torohealth.config.Config;
 import net.torocraft.torohealth.config.Config.InWorld;
 import net.torocraft.torohealth.config.Config.Mode;
+import net.torocraft.torohealth.display.Hud;
 import net.torocraft.torohealth.util.EntityUtil;
 import net.torocraft.torohealth.util.EntityUtil.Relation;
 
@@ -48,6 +49,10 @@ public class HealthBarRenderer {
       return;
     }
 
+    if (ToroHealth.HUD.isIgnoreEntity(entity, Hud.IgnoreCheckTarget.WORLD)) {
+    	return;
+    };
+    
     if (entity.distanceTo(client.getCameraEntity()) > ToroHealth.CONFIG.inWorld.distance) {
       return;
     }
