@@ -35,5 +35,6 @@
   "net.torocraft.torohealth.panda.gene.PLAYFUL": "やんちゃ",
   "net.torocraft.torohealth.panda.gene.BROWN": "茶色",
   "net.torocraft.torohealth.panda.gene.WEAK": "弱い",
-  "net.torocraft.torohealth.panda.gene.AGGRESSIVE": "短気"
+  "net.torocraft.torohealth.panda.gene.AGGRESSIVE": "短気",
+  "net.torocraft.torohealth.villagerBiome": "バイオーム"
 }
