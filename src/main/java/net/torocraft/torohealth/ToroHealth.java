@@ -1,6 +1,10 @@
 package net.torocraft.torohealth;
 
 import java.util.Random;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -20,6 +24,7 @@ public class ToroHealth {
   public static RayTrace RAYTRACE = new RayTrace();
   public static boolean IS_HOLDING_WEAPON = false;
   public static Random RAND = new Random();
+  private static final Logger log = LogManager.getLogger(MODID);
 
   private static ConfigLoader<Config> CONFIG_LOADER = new ConfigLoader<>(new Config(),
       ToroHealth.MODID + ".json", config -> ToroHealth.CONFIG = config);
@@ -34,4 +39,9 @@ public class ToroHealth {
     CONFIG_LOADER.load();
   }
 
+  public static void log(String message) {
+	if (log == null)
+		return;
+	log.info("[{}] {}", log.getName(), message);
+  }
 }

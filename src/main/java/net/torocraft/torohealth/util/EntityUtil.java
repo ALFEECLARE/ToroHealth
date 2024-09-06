@@ -1,6 +1,7 @@
 package net.torocraft.torohealth.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -30,6 +31,7 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Slime;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.Instrument;
 import net.minecraft.world.item.InstrumentItem;
 import net.minecraft.world.item.ItemStack;
@@ -83,6 +85,9 @@ public class EntityUtil {
 		if (entity instanceof AbstractHorse) {
 			AbstractHorse horseEntity = (AbstractHorse)entity;
 			answer.addAll(getHorseExtraData(horseEntity));
+		}
+		if (entity instanceof Villager) {
+			answer.add(Component.translatable("net.torocraft.torohealth.villagerBiome").getString() + " : " + Component.translatable("biome.minecraft." + ((Villager)entity).getVillagerData().getType().toString()).getString());
 		}
 		switch(entity.getClass().getName()) {
 			case "":
@@ -153,4 +158,9 @@ public class EntityUtil {
 			return "";
 		}
 	}
+	
+	public static List<String> getIgnoreEntityList(String entityKeyString) {
+		return Arrays.asList(entityKeyString.split(","));
+	}
+	
 }

@@ -28,6 +28,12 @@ public class Hud implements IGuiOverlay {
   private BarDisplay barDisplay;
   private Config config = new Config();
   private int age;
+  private static List<String> ignoreEntityListInHud = null;
+  private static List<String> ignoreEntityListInWorld = null;
+
+  public enum IgnoreCheckTarget {
+	    HUD, WORLD
+  }
 
   public Hud() {
     this.minecraft = Minecraft.getInstance();
@@ -119,6 +125,10 @@ public class Hud implements IGuiOverlay {
       return;
     }
 
+    if (ToroHealth.HUD.isIgnoreEntity(entity, Hud.IgnoreCheckTarget.HUD)) {
+    	return;
+    }
+    
     gui.pose().pushPose();
     gui.pose().scale(scale, scale, scale);
     gui.pose().translate(x, y, 0);
@@ -142,5 +152,27 @@ public class Hud implements IGuiOverlay {
     int w = 160, h = 60;
     gui.blit(BACKGROUND_TEXTURE, 0, 0, 0.0f, 0.0f, w, h, w, h);
   }
+  
+  public void updateIgnoreList(String hudIgnoreString,String worldIgnoreString) {
+	  ignoreEntityListInHud = EntityUtil.getIgnoreEntityList(hudIgnoreString);
+	  ignoreEntityListInWorld = EntityUtil.getIgnoreEntityList(worldIgnoreString);
+  }
+
+  public boolean isIgnoreEntity(LivingEntity entity,IgnoreCheckTarget targetList) {
+    if (ignoreEntityListInHud == null || ignoreEntityListInWorld == null) { updateIgnoreList(config.hud.ignoreEntity,config.inWorld.ignoreEntity); }
+		String entityId = entity.getEncodeId();
+		List<String> ignoreList = null;
+		switch (targetList) {
+			case HUD:
+				ignoreList = ignoreEntityListInHud;
+				break;
+			case WORLD:
+				ignoreList = ignoreEntityListInWorld;
+				break;
+			default:
+				throw new IllegalArgumentException("Illgal Target");
+		}
+		return ignoreList.stream().anyMatch(pattern -> entityId.matches(pattern));
+	}
 }
 
