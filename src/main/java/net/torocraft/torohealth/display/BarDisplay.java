@@ -3,6 +3,7 @@ package net.torocraft.torohealth.display;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -15,10 +16,12 @@ import net.torocraft.torohealth.util.EntityUtil;
 
 public class BarDisplay {
 
-	private static final ResourceLocation ICON_TEXTURES = new ResourceLocation("textures/gui/icons.png");
 	private final Minecraft mc;
+	private static final ResourceLocation HEART_TEXTURES = Gui.HeartType.NORMAL.getSprite(false, false, false);
+	private static final ResourceLocation ARMOR_TEXTURES = ResourceLocation.withDefaultNamespace("hud/armor_full");
+	private static final ResourceLocation ACTUAL_ARMOR_TEXTURES = ResourceLocation.withDefaultNamespace("textures/gui/sprites/hud/armor_full.png");
 	public static final int BAR_OFFSET_X = 63;
-	public static final int BAR_OFFSET_Y = 14;
+	public static final int BAR_OFFSET_Y = 12;
 	public static final int BAR_WIDTH = 130;
 	public static final int BAR_HEIGHT = 6; //when inWorld is false.
 	public static final int EXTRADATA_Y_BASE_OFFSET = 20; //when inWorld is false.
@@ -41,11 +44,12 @@ public class BarDisplay {
 		
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderTexture(0, ICON_TEXTURES);
+		RenderSystem.setShaderTexture(0, ACTUAL_ARMOR_TEXTURES);
 		RenderSystem.enableBlend();
 
 		HealthBarRenderer.render(guigraphic, entity, BAR_OFFSET_X, BAR_OFFSET_Y, BAR_WIDTH, false);
-		String name = getEntityName(entity);
+
+	  	String name = getEntityName(entity);
 		int healthMax = Mth.ceil(entity.getMaxHealth());
 		int healthCur = Math.min(Mth.ceil(entity.getHealth()), healthMax);
 		String healthText = healthCur + "/" + healthMax;
@@ -76,13 +80,14 @@ public class BarDisplay {
 				yOffset += mc.font.lineHeight;
 			}
 		}
+		guigraphic.flush();
 	}
 
 	private void renderArmorIcon(GuiGraphics gui, int x, int y) {
-		gui.blit(ICON_TEXTURES, x, y, 34, 9, 9, 9);
+		gui.blitSprite(ARMOR_TEXTURES, x, y, 9, 9);
 	}
 
 	private void renderHeartIcon(GuiGraphics gui, int x, int y) {
-		gui.blit(ICON_TEXTURES, x, y, 16 + 36, 0, 9, 9);
+		gui.blitSprite(HEART_TEXTURES, x, y, 9, 9);
 	}
 }

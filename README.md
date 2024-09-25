@@ -1,11 +1,27 @@
-# ToroHealth Damage Indicators
 
-With ToroHealth Damage Indicators, damage given, received, or mitigated will be displayed as a number that pops off of the entity.
+Installation information
+=======
 
-Also, health bars will appear in the top left corner for the entity in the player's crosshairs.
+This template repository can be directly cloned to get you started with a new
+mod. Simply create a new repository cloned from this one, by following the
+instructions at [github](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
 
-Customization options are available for changing the color of the damage numbers and the display style of the health bar (Compact or Standard).  I will soon be adding options to re-position the health bars and may make some visual tweaks to them.
+Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
 
-### [Download from here](https://minecraft.curseforge.com/projects/torohealth-damage-indicators)
+> **Note**: For Eclipse, use tasks in `Launch Group` instead of ones founds in `Java Application`. A preparation task must run before launching the game. NeoGradle uses launch groups to do these subsequently.
 
-![Screenshot](https://i.imgur.com/C9oBhZ5.png)
+If at any point you are missing libraries in your IDE, or you've run into problems you can
+run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
+{this does not affect your code} and then start the process again.
+
+Mapping Names:
+============
+By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
+in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
+license. For the latest license text, refer to the mapping file itself, or the reference copy here:
+https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+
+Additional Resources: 
+==========
+Community Documentation: https://docs.neoforged.net/  
+NeoForged Discord: https://discord.neoforged.net/

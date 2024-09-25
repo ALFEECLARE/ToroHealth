@@ -5,10 +5,10 @@ import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.torocraft.torohealth.config.Config;
 import net.torocraft.torohealth.config.loader.ConfigLoader;
 import net.torocraft.torohealth.display.Hud;
@@ -29,10 +29,9 @@ public class ToroHealth {
   private static ConfigLoader<Config> CONFIG_LOADER = new ConfigLoader<>(new Config(),
       ToroHealth.MODID + ".json", config -> ToroHealth.CONFIG = config);
 
-  public ToroHealth() {
-    FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-    MinecraftForge.EVENT_BUS.register(this);
-    ToroHealthClient.init();
+  public ToroHealth(IEventBus modEventBus, ModContainer modContainer) {
+    modEventBus.addListener(this::setup);
+    ToroHealthClient.init(modEventBus, modContainer);
   }
 
   private void setup(final FMLCommonSetupEvent event) {

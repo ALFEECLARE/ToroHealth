@@ -1,18 +1,19 @@
 package net.torocraft.torohealth.display;
 
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Chicken;
+import net.minecraft.world.entity.animal.Turtle;
+import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.npc.Villager;
 
@@ -34,10 +35,10 @@ public class EntityDisplay {
     updateScale();
   }
 
-  public void draw(PoseStack matrix, float scale) {
+  public void draw(GuiGraphics matrix, float scale) {
     if (entity != null) {
       try {
-        drawEntity(matrix, (int) xOffset, (int) yOffset, entityScale, -80, -20, entity, scale);
+    	renderEntityInInventory(matrix, (int) xOffset, (int) yOffset, entityScale, -80, -20, entity, scale);
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -53,76 +54,67 @@ public class EntityDisplay {
     int scaleX = Mth.ceil(RENDER_WIDTH / entity.getBbHeight());
     entityScale = Math.min(scaleX, scaleY);
 
-    if (entity instanceof Chicken) {
-      entityScale *= 0.7;
-    }
-
-    if (entity instanceof Villager && entity.isSleeping()) {
-      entityScale = entity.isBaby() ? 31 : 16;
-    }
+    entityScale *= (float)switch (entity) {
+    	case Chicken chicken                              -> 0.7;
+    	case Turtle turtle                                -> 0.4;
+    	case Armadillo armadillo                          -> 0.9;
+    	case Villager villager when villager.isSleeping() -> villager.isBaby() ? 31 : 16;
+    	default                                           -> 1;
+    };
 
     xOffset = WIDTH / 2;
 
     yOffset = HEIGHT / 2 + RENDER_HEIGHT / 2;
-    if (entity instanceof Ghast) {
-      yOffset -= 10;
-    }
+    yOffset -= switch (entity) {
+    	case Ghast ghast   -> 10;
+    	case Turtle turtle -> 5;
+    	default            -> 0;
+    };
   }
 
   /**
-   * copied from InventoryScreen.drawEntity() to expose the matrixStack
+   * copied from InventoryScreen.renderEntityInInventory() to expose the matrixStack
    */
-  public static void drawEntity(PoseStack matrixStack2, int x, int y, int size, float mouseX,
-      float mouseY, LivingEntity entity, float scale) {
-    float f = (float) Math.atan((double) (mouseX / 40.0F));
-    float g = (float) Math.atan((double) (mouseY / 40.0F));
-    PoseStack matrixStack = RenderSystem.getModelViewStack();
-    matrixStack.pushPose();
-    matrixStack.translate((double) x * scale, (double) y * scale, 1050.0D * scale);
-    matrixStack.scale(1.0F, 1.0F, -1.0F);
-    RenderSystem.applyModelViewMatrix();
-    matrixStack2.pushPose();
-    matrixStack2.translate(0.0D, 0.0D, 1000.0D);
-    matrixStack2.scale((float) size, (float) size, (float) size);
-    Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
-    Quaternionf quaternion2 = Axis.XP.rotationDegrees(g * 20.0F);
-    quaternion.mul(quaternion2);
-    matrixStack2.mulPose(quaternion);
-    float h = entity.yBodyRot; // bodyYaw;
-    float i = entity.getYRot(); // getYaw();
-    float j = entity.getXRot(); // getPitch();
-    float k = entity.yHeadRotO; // prevHeadYaw;
-    float l = entity.yHeadRot; // headYaw;
-    entity.yBodyRot = 180.0F + f * 20.0F;
-    entity.setYRot(180.0F + f * 40.0F);
-    entity.setXRot(-g * 20.0F);
-    entity.yHeadRot = entity.getYRot();
-    entity.yHeadRotO = entity.getYRot();
-    Lighting.setupForEntityInInventory();
-    EntityRenderDispatcher entityrenderdispatcher =
-        Minecraft.getInstance().getEntityRenderDispatcher();
-    quaternion2.conjugate();
-    entityrenderdispatcher.overrideCameraOrientation(quaternion2);
-    entityrenderdispatcher.setRenderShadow(false);
-    MultiBufferSource.BufferSource immediate =
-        Minecraft.getInstance().renderBuffers().bufferSource();
-
-    RenderSystem.runAsFancy(() -> {
-      entityrenderdispatcher.render(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, matrixStack2, immediate,
-          15728880);
-    });
-
-    immediate.endBatch();
-    entityrenderdispatcher.setRenderShadow(true);
-    entity.yBodyRot = h;
-    entity.setYRot(i);
-    entity.setXRot(j);
-    entity.yHeadRotO = k;
-    entity.yHeadRot = l;
-    matrixStack.popPose();
-    matrixStack2.popPose();
-    RenderSystem.applyModelViewMatrix();
-    Lighting.setupFor3DItems();
+  public static void renderEntityInInventory(GuiGraphics pGuiGraphics, float pX, float pY, int pSize, 
+		  float pMouseX, float pMouseY, LivingEntity pEntity , float pScale) {
+	float f2 = (float)Math.atan((double)(pMouseX / 40.0F));
+	float f3 = (float)Math.atan((double)(pMouseY / 40.0F));
+    float f4 = pEntity.yBodyRot;
+    float f5 = pEntity.getYRot();
+    float f6 = pEntity.getXRot();
+    float f7 = pEntity.yHeadRotO;
+    float f8 = pEntity.yHeadRot;
+	pEntity.yBodyRot = 180.0F + f2 * 20.0F;
+	pEntity.setYRot(180.0F + f2 * 40.0F);
+	pEntity.setXRot(-f3 * 20.0F);
+	pEntity.yHeadRot = pEntity.getYRot();
+	pEntity.yHeadRotO = pEntity.getYRot();
+	pGuiGraphics.pose().pushPose();
+	pGuiGraphics.pose().translate((double)pX * pScale, (double)pY * pScale, 1050.0 * pScale);
+	pGuiGraphics.pose().scale(1, 1, -1);
+	Vector3f pTranslate = new Vector3f(0.0F, 0, 1000.0F);
+	pGuiGraphics.pose().translate(pTranslate.x, pTranslate.y, pTranslate.z);
+	pGuiGraphics.pose().scale(pSize * 1.25f, pSize * 1.25f, pSize * 1.25f);
+	Quaternionf pPose = new Quaternionf().rotateZ((float) Math.PI); 
+	Quaternionf pCameraOrientation = new Quaternionf().rotateX(f3 * 20.0F * (float) (Math.PI / 180.0));
+	pPose.mul(pCameraOrientation);
+	pGuiGraphics.pose().mulPose(pPose);
+	Lighting.setupForEntityInInventory();
+	EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+	if (pCameraOrientation != null) {
+		entityrenderdispatcher.overrideCameraOrientation(pCameraOrientation.conjugate(new Quaternionf()).rotateY((float) Math.PI));
+	}
+	
+	entityrenderdispatcher.setRenderShadow(false);
+	RenderSystem.runAsFancy(() -> entityrenderdispatcher.render(pEntity, 0.0, 0.0, 0.0, 0.0F, 1.0F, pGuiGraphics.pose(), pGuiGraphics.bufferSource(), 15728880));
+	pGuiGraphics.flush();
+	entityrenderdispatcher.setRenderShadow(true);
+	pGuiGraphics.pose().popPose();
+	Lighting.setupFor3DItems();
+	pEntity.yBodyRot = f4;
+    pEntity.setYRot(f5);
+    pEntity.setXRot(f6);
+    pEntity.yHeadRotO = f7;
+    pEntity.yHeadRot = f8;
   }
-
 }

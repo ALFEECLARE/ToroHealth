@@ -1,7 +1,8 @@
 package net.torocraft.torohealth.config.loader;
 
 import java.io.File;
-import net.minecraftforge.fml.loading.FMLPaths;
+
+import net.neoforged.fml.loading.FMLPaths;
 
 public class ConfigFolder {
 

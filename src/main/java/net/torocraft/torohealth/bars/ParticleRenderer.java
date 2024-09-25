@@ -30,7 +30,7 @@ public class ParticleRenderer {
     float scaleToGui = 0.025f;
 
     Minecraft client = Minecraft.getInstance();
-    float tickDelta = client.getDeltaFrameTime();
+    float tickDelta = client.getTimer().getGameTimeDeltaTicks();
 
     double x = Mth.lerp((double) tickDelta, particle.xPrev, particle.x);
     double y = Mth.lerp((double) tickDelta, particle.yPrev, particle.y);

@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -31,8 +32,7 @@ import net.torocraft.torohealth.util.EntityUtil.Relation;
 
 public class HealthBarRenderer {
 
-  private static final ResourceLocation GUI_BARS_TEXTURES = new ResourceLocation(
-      ToroHealth.MODID + ":textures/gui/bars.png");
+  private static final ResourceLocation GUI_BARS_TEXTURES = ResourceLocation.parse(ToroHealth.MODID + ":textures/gui/bars.png");
   private static final int DARK_GRAY = 0x808080;
   private static final float FULL_SIZE = 40;
 
@@ -203,18 +203,13 @@ public class HealthBarRenderer {
     float zOffsetAmount = inWorld ? -0.1F : 0.1F;
 
     Tesselator tessellator = Tesselator.getInstance();
-    BufferBuilder buffer = tessellator.getBuilder();
-    buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+    BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 
-    buffer.vertex(matrix4f, (float) (-half + x), (float) y, zOffset * zOffsetAmount)
-        .uv(u * c, v * c).endVertex();
-    buffer.vertex(matrix4f, (float) (-half + x), (float) (h + y), zOffset * zOffsetAmount)
-        .uv(u * c, (v + vh) * c).endVertex();
-    buffer.vertex(matrix4f, (float) (-half + size + x), (float) (h + y), zOffset * zOffsetAmount)
-        .uv((u + uw) * c, (v + vh) * c).endVertex();
-    buffer.vertex(matrix4f, (float) (-half + size + x), (float) y, zOffset * zOffsetAmount)
-        .uv(((u + uw) * c), v * c).endVertex();
-    tessellator.end();
+    buffer.addVertex(matrix4f, (float) (-half + x), (float) y, zOffset * zOffsetAmount).setUv(u * c, v * c);
+    buffer.addVertex(matrix4f, (float) (-half + x), (float) (h + y), zOffset * zOffsetAmount).setUv(u * c, (v + vh) * c);
+    buffer.addVertex(matrix4f, (float) (-half + size + x), (float) (h + y), zOffset * zOffsetAmount).setUv((u + uw) * c, (v + vh) * c);
+    buffer.addVertex(matrix4f, (float) (-half + size + x), (float) y, zOffset * zOffsetAmount).setUv(((u + uw) * c), v * c);
+    BufferUploader.drawWithShader(buffer.buildOrThrow());
     RenderSystem.setShaderColor(1, 1, 1, 1);
     RenderSystem.disableBlend();
   }

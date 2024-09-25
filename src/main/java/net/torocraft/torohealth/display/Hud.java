@@ -4,20 +4,19 @@ import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.torocraft.torohealth.ToroHealth;
 import net.torocraft.torohealth.config.Config;
 import net.torocraft.torohealth.config.Config.AnchorPoint;
 import net.torocraft.torohealth.util.EntityUtil;
 
-public class Hud implements IGuiOverlay {
-  private static final ResourceLocation BACKGROUND_TEXTURE =
-      new ResourceLocation(ToroHealth.MODID + ":textures/gui/default_skin_basic.png");
+public class Hud implements LayeredDraw.Layer {
+  private static final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.parse(ToroHealth.MODID + ":textures/gui/default_skin_basic.png");
   private EntityDisplay entityDisplay = new EntityDisplay();
   private int BASE_X_OFFSET = -10;
   private int BASE_Y_OFFSET = -10;
@@ -40,9 +39,9 @@ public class Hud implements IGuiOverlay {
     barDisplay = new BarDisplay(Minecraft.getInstance());
   }
 
-  public void render(ForgeGui gui,GuiGraphics guigraphics, float partialTick, int width, int height) {
+  public void render(GuiGraphics guigraphics, DeltaTracker delta) {
 	//gui.setTitle(Component.literal("ToroHealth HUD"));
-    if (this.minecraft.options.renderDebug) {
+    if (this.minecraft.getDebugOverlay().showDebugScreen()) {
       return;
     }
     this.config = ToroHealth.CONFIG;
@@ -126,7 +125,7 @@ public class Hud implements IGuiOverlay {
     }
 
     if (ToroHealth.HUD.isIgnoreEntity(entity, Hud.IgnoreCheckTarget.HUD)) {
-    	return;
+      return;
     }
     
     gui.pose().pushPose();
@@ -137,7 +136,7 @@ public class Hud implements IGuiOverlay {
     }
     gui.pose().translate(10, 10, 0);
     if (config.hud.showEntity) {
-      entityDisplay.draw(gui.pose(), scale);
+      entityDisplay.draw(gui, scale);
     }
     gui.pose().translate(44, 0, 0);
     if (config.hud.showBar) {
@@ -161,6 +160,9 @@ public class Hud implements IGuiOverlay {
   public boolean isIgnoreEntity(LivingEntity entity,IgnoreCheckTarget targetList) {
     if (ignoreEntityListInHud == null || ignoreEntityListInWorld == null) { updateIgnoreList(config.hud.ignoreEntity,config.inWorld.ignoreEntity); }
 		String entityId = entity.getEncodeId();
+		if (entityId == null) {
+			return false;
+		}
 		List<String> ignoreList = null;
 		switch (targetList) {
 			case HUD:
