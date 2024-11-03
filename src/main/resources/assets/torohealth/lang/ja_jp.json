@@ -36,5 +36,16 @@
   "net.torocraft.torohealth.panda.gene.BROWN": "茶色",
   "net.torocraft.torohealth.panda.gene.WEAK": "弱い",
   "net.torocraft.torohealth.panda.gene.AGGRESSIVE": "短気",
-  "net.torocraft.torohealth.villagerBiome": "バイオーム"
+  "net.torocraft.torohealth.wolf.variant.pale": "白色(タイガ)",
+  "net.torocraft.torohealth.wolf.variant.spotted": "まだら(サバンナの高原)'",
+  "net.torocraft.torohealth.wolf.variant.snowy": "雪色(林)",
+  "net.torocraft.torohealth.wolf.variant.black": "黒色(マツの原生林)",
+  "net.torocraft.torohealth.wolf.variant.ashen": "灰色(雪のタイガ)",
+  "net.torocraft.torohealth.wolf.variant.rusty": "赤茶色(まばらなジャングル)",
+  "net.torocraft.torohealth.wolf.variant.woods": "森(森林)",
+  "net.torocraft.torohealth.wolf.variant.chestnut": "栗色(トウヒの原生林)",
+  "net.torocraft.torohealth.wolf.variant.striped": "シマ(森のある荒野)",
+
+  "net.torocraft.torohealth.label.biome": "バイオーム" ,
+  "net.torocraft.torohealth.label.variant": "種類"
 }

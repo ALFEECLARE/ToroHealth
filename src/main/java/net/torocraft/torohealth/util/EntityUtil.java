@@ -21,6 +21,7 @@ import net.minecraft.world.entity.animal.AbstractFish;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Panda;
 import net.minecraft.world.entity.animal.Squid;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.animal.camel.Camel;
 import net.minecraft.world.entity.animal.goat.Goat;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
@@ -78,7 +79,7 @@ public class EntityUtil {
 			answer.addAll(getHorseExtraData(horseEntity));
 		}
 		if (entity instanceof Villager) {
-			answer.add(Component.translatable("net.torocraft.torohealth.villagerBiome").getString() + " : " + Component.translatable("biome.minecraft." + ((Villager)entity).getVillagerData().getType().toString()).getString());
+			answer.add(Component.translatable("net.torocraft.torohealth.label.biome").getString() + " : " + Component.translatable("biome.minecraft." + ((Villager)entity).getVillagerData().getType().toString()).getString());
 		}
 		switch(entity.getClass().getName()) {
 			case "":
@@ -92,6 +93,10 @@ public class EntityUtil {
 				answer.add(Component.translatable("net.torocraft.torohealth.panda.maingene").getString() + " : " + Component.translatable("net.torocraft.torohealth.panda.gene." + pandaEntity.getMainGene().name()).getString());
 				answer.add(Component.translatable("net.torocraft.torohealth.panda.hiddengene").getString() + " : " + Component.translatable("net.torocraft.torohealth.panda.gene." + pandaEntity.getHiddenGene().name()).getString());
 				answer.add(Component.translatable("net.torocraft.torohealth.panda.finallygene").getString() + " : " + Component.translatable("net.torocraft.torohealth.panda.gene." + pandaEntity.getVariant().name()).getString());
+				break;
+			case "net.minecraft.world.entity.animal.Wolf":
+				Wolf wolfEntity = (Wolf)entity;
+				answer.add(Component.translatable("net.torocraft.torohealth.label.variant").getString() + " : " + Component.translatable("net.torocraft.torohealth.wolf.variant." + wolfEntity.getVariant().unwrapKey().get().location().getPath()).getString());
 				break;
 			default:
 				break;

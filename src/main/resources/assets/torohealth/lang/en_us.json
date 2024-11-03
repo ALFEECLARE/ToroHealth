@@ -36,5 +36,16 @@
   "net.torocraft.torohealth.panda.gene.BROWN": "Brown",
   "net.torocraft.torohealth.panda.gene.WEAK": "Weak",
   "net.torocraft.torohealth.panda.gene.AGGRESSIVE": "Aggressive" ,
-  "net.torocraft.torohealth.villagerBiome": "Biome"
+  "net.torocraft.torohealth.wolf.variant.pale": "Pale(Taiga)",
+  "net.torocraft.torohealth.wolf.variant.spotted": "Spoted(Savanna Plateau)'",
+  "net.torocraft.torohealth.wolf.variant.snowy": "Snowy(Grove)",
+  "net.torocraft.torohealth.wolf.variant.black": "Black(Old Growth Pine Taiga)",
+  "net.torocraft.torohealth.wolf.variant.ashen": "Ashen(Snowy Taiga)",
+  "net.torocraft.torohealth.wolf.variant.rusty": "Rusty(Sparse Jungle)",
+  "net.torocraft.torohealth.wolf.variant.woods": "Woods(Forest)",
+  "net.torocraft.torohealth.wolf.variant.chestnut": "Chestnut(Old Growth Spruce Taiga)",
+  "net.torocraft.torohealth.wolf.variant.striped": "Striped(Wooded Badlands)",
+
+  "net.torocraft.torohealth.label.biome": "Biome",
+  "net.torocraft.torohealth.label.variant": "Variants"
 }
