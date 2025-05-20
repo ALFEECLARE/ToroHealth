@@ -9,66 +9,84 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.Chicken;
+import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.Turtle;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 
 public class EntityDisplay {
+	private static final float RENDER_HEIGHT = 30;
+	private static final float RENDER_WIDTH = 18;
+	private static final float WIDTH = 40;
+	private static final float HEIGHT = WIDTH;
 
-  private static final float RENDER_HEIGHT = 30;
-  private static final float RENDER_WIDTH = 18;
-  private static final float WIDTH = 40;
-  private static final float HEIGHT = WIDTH;
+	private LivingEntity entity;
+	private BlockEntity block;
+	private float entityScale = 1;
 
-  private LivingEntity entity;
-  private int entityScale = 1;
+	private float xOffset;
+	private float yOffset;
 
-  private float xOffset;
-  private float yOffset;
+	public void setEntity(LivingEntity entity) {
+		this.entity = entity;
+		updateScale();
+	}
 
-  public void setEntity(LivingEntity entity) {
-    this.entity = entity;
-    updateScale();
-  }
+	public void setBlock(BlockEntity block) {
+		this.block = block;
+	}
 
-  public void draw(GuiGraphics matrix, float scale) {
-    if (entity != null) {
-      try {
-    	renderEntityInInventory(matrix, (int) xOffset, (int) yOffset, entityScale, -80, -20, entity, scale);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-  }
+	public void draw(GuiGraphics matrix, float scale) {
+		if (entity != null) {
+			try {
+		        renderEntityInInventory(matrix, (int) xOffset, (int) yOffset, (int)entityScale, -80, -20, entity, scale);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (block != null) {
+			if (block instanceof SignBlockEntity sbe) {
+				try {
+					matrix.renderFakeItem(new ItemStack(sbe.getBlockState().getBlock()), (int)((WIDTH - 16) / 2), (int)((HEIGHT - 16) / 2)); 
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
   private void updateScale() {
     if (entity == null) {
       return;
     }
 
-    int scaleY = Mth.ceil(RENDER_HEIGHT / entity.getBbHeight());
-    int scaleX = Mth.ceil(RENDER_WIDTH / entity.getBbHeight());
+    float scaleY = RENDER_HEIGHT / Math.max(entity.getBbHeight(),entity.getBbWidth());
+    float scaleX = RENDER_WIDTH / Math.max(entity.getBbHeight(),entity.getBbWidth());
     entityScale = Math.min(scaleX, scaleY);
 
     entityScale *= (float)switch (entity) {
-    	case Chicken chicken                              -> 0.7;
-    	case Turtle turtle                                -> 0.4;
+    	case IronGolem ironGolem                          -> 1.2;
     	case Armadillo armadillo                          -> 0.9;
-    	case Villager villager when villager.isSleeping() -> villager.isBaby() ? 31 : 16;
+    	case Villager villager when villager.isSleeping() -> ((float)(villager.isBaby() ? 21 : 12)) / entityScale;
     	default                                           -> 1;
     };
 
-    xOffset = WIDTH / 2;
+    xOffset = (WIDTH) / 2;
+    xOffset += switch (entity) {
+    	case Villager villager when villager.isSleeping() -> -3;
+		default                                            -> 0;
+    };
 
-    yOffset = HEIGHT / 2 + RENDER_HEIGHT / 2;
+    yOffset = (HEIGHT + RENDER_HEIGHT) / 2;
     yOffset -= switch (entity) {
-    	case Ghast ghast   -> 10;
-    	case Turtle turtle -> 5;
-    	default            -> 0;
+    	case Ghast ghast                                  -> 10;
+    	case Turtle turtle                                -> 3;
+    	case Villager villager when villager.isSleeping() -> 15;
+    	default                                           -> 0;
     };
   }
 
@@ -90,13 +108,13 @@ public class EntityDisplay {
 	pEntity.yHeadRot = pEntity.getYRot();
 	pEntity.yHeadRotO = pEntity.getYRot();
 	pGuiGraphics.pose().pushPose();
-	pGuiGraphics.pose().translate((double)pX * pScale, (double)pY * pScale, 1050.0 * pScale);
+	pGuiGraphics.pose().translate((double)pX * pScale, (double)pY * pScale, (double)1050.0 * pScale);
 	pGuiGraphics.pose().scale(1, 1, -1);
-	Vector3f pTranslate = new Vector3f(0.0F, 0, 1000.0F);
+	Vector3f pTranslate = new Vector3f(0.0F, 0.0F, 1000.0F);
 	pGuiGraphics.pose().translate(pTranslate.x, pTranslate.y, pTranslate.z);
 	pGuiGraphics.pose().scale(pSize * 1.25f, pSize * 1.25f, pSize * 1.25f);
-	Quaternionf pPose = new Quaternionf().rotateZ((float) Math.PI); 
-	Quaternionf pCameraOrientation = new Quaternionf().rotateX(f3 * 20.0F * (float) (Math.PI / 180.0));
+	Quaternionf pPose = new Quaternionf().rotateZ(180.0F * (float) (Math.PI / 180.0)); 
+   	Quaternionf pCameraOrientation = new Quaternionf().rotateX(f3 * 20.0F * (float) (Math.PI / 180.0));
 	pPose.mul(pCameraOrientation);
 	pGuiGraphics.pose().mulPose(pPose);
 	Lighting.setupForEntityInInventory();
@@ -109,12 +127,12 @@ public class EntityDisplay {
 	RenderSystem.runAsFancy(() -> entityrenderdispatcher.render(pEntity, 0.0, 0.0, 0.0, 0.0F, 1.0F, pGuiGraphics.pose(), pGuiGraphics.bufferSource(), 15728880));
 	pGuiGraphics.flush();
 	entityrenderdispatcher.setRenderShadow(true);
-	pGuiGraphics.pose().popPose();
 	Lighting.setupFor3DItems();
 	pEntity.yBodyRot = f4;
     pEntity.setYRot(f5);
     pEntity.setXRot(f6);
     pEntity.yHeadRotO = f7;
     pEntity.yHeadRot = f8;
+	pGuiGraphics.pose().popPose();
   }
 }

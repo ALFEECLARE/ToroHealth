@@ -10,6 +10,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.torocraft.torohealth.ToroHealth;
 import net.torocraft.torohealth.config.Config;
 import net.torocraft.torohealth.config.Config.AnchorPoint;
@@ -24,6 +26,7 @@ public class Hud implements LayeredDraw.Layer {
   private int DRAW_AREA_HEIGHT = 60 + BASE_Y_OFFSET;
   private Minecraft minecraft;
   private LivingEntity entity;
+  private BlockEntity block;
   private BarDisplay barDisplay;
   private Config config = new Config();
   private int age;
@@ -37,6 +40,10 @@ public class Hud implements LayeredDraw.Layer {
   public Hud() {
     this.minecraft = Minecraft.getInstance();
     barDisplay = new BarDisplay(Minecraft.getInstance());
+  }
+
+  public Minecraft getMC() {
+	return this.minecraft; 
   }
 
   public void render(GuiGraphics guigraphics, DeltaTracker delta) {
@@ -115,19 +122,46 @@ public class Hud implements LayeredDraw.Layer {
     return entity;
   }
 
-  private void draw(GuiGraphics gui,float x, float y, float scale, List<String> extraDataList) {
-    if (entity == null) {
-      return;
-    }
-    
-    if (config.hud.onlyWhenHurt && entity.getHealth() >= entity.getMaxHealth()) {
-      return;
-    }
+  public void setBlock(BlockEntity block) {
+	    if (block != null) {
+	      age = 0;
+	    }
 
-    if (ToroHealth.HUD.isIgnoreEntity(entity, Hud.IgnoreCheckTarget.HUD)) {
-      return;
+	    if (block == null && age > config.hud.hideDelay) {
+	    	setBlockEntity(null);
+	    }
+
+	    if (block != null && block != this.block) {
+	    	setBlockEntity(block);
+	    }
+  }
+
+  private void setBlockEntity(BlockEntity block) {
+    this.block = block;
+    entityDisplay.setBlock(block);
+  }
+
+  public BlockEntity getBlock() {
+    return block;
+  }
+
+  private void draw(GuiGraphics gui,float x, float y, float scale, List<String> extraDataList) {
+    if (entity == null && block == null) {
+    	return;
+    }else if (entity != null) {
+	    if (config.hud.onlyWhenHurt && entity.getHealth() >= entity.getMaxHealth()) {
+	      return;
+	    }
+	
+	    if (ToroHealth.HUD.isIgnoreEntity(entity, Hud.IgnoreCheckTarget.HUD)) {
+	      return;
+	    }
+    } else if (block != null) {
+	    if (!config.hud.showSignText || !(block instanceof SignBlockEntity)) {
+		      return;
+	    }
     }
-    
+	    
     gui.pose().pushPose();
     gui.pose().scale(scale, scale, scale);
     gui.pose().translate(x, y, 0);
@@ -140,7 +174,7 @@ public class Hud implements LayeredDraw.Layer {
     }
     gui.pose().translate(44, 0, 0);
     if (config.hud.showBar) {
-      barDisplay.draw(gui, entity);
+      barDisplay.draw(gui, entity, block);
     }
     gui.pose().popPose();
     gui.flush();

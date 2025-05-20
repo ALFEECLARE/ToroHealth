@@ -19,9 +19,11 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.torocraft.torohealth.bars.BarStates;
 import net.torocraft.torohealth.bars.HealthBarRenderer;
 import net.torocraft.torohealth.bars.ParticleRenderer;
+import net.torocraft.torohealth.util.BlockUtil;
 import net.torocraft.torohealth.util.HoldingWeaponUpdater;
 
 public class ClientEventHandler {
+	private static Minecraft mc = Minecraft.getInstance();
 
   public static void init(IEventBus modEventBus, ModContainer modContainer) {
     NeoForge.EVENT_BUS.addListener(ClientEventHandler::playerTick);
@@ -43,7 +45,6 @@ public class ClientEventHandler {
   @SubscribeEvent
     private static void renderParticles(RenderLevelStageEvent event) {
       if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
-        Minecraft mc = Minecraft.getInstance();
         Camera camera = mc.gameRenderer.getMainCamera();
         GuiGraphics gui = new GuiGraphics(mc, mc.renderBuffers().bufferSource());
         gui.pose().mulPose(event.getPoseStack().last().pose());
@@ -59,6 +60,8 @@ public class ClientEventHandler {
     }
     ToroHealthClient.HUD.setEntity(
         ToroHealthClient.RAYTRACE.getEntityInCrosshair(0, ToroHealth.CONFIG.hud.distance));
+    ToroHealthClient.HUD.setBlock(
+            ToroHealthClient.RAYTRACE.getBlockEntity(BlockUtil.getLookingBlockPos(mc)));
     BarStates.tick();
     HoldingWeaponUpdater.update();
     ToroHealthClient.HUD.tick();

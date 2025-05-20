@@ -43,6 +43,7 @@ public class Config implements IConfig {
     public boolean showExtraData = true;
     public DataViewType showDataType = DataViewType.MINMAX;
     public String ignoreEntity = "";
+    public boolean showSignText = true;
   }
 
   public static class Particle {
