@@ -17,7 +17,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -97,7 +97,7 @@ public class HealthBarRenderer {
       return;
     }
 
-    RenderSystem.setShader(GameRenderer::getPositionColorShader);
+    RenderSystem.setShader(CoreShaders.POSITION_COLOR);
     RenderSystem.enableDepthTest();
     RenderSystem.enableBlend();
     RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE,
@@ -195,7 +195,7 @@ public class HealthBarRenderer {
     float b = (color & 255) / 255.0F;
 
     RenderSystem.setShaderColor(r, g, b, 1);
-    RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    RenderSystem.setShader(CoreShaders.POSITION_TEX);
     RenderSystem.setShaderTexture(0, GUI_BARS_TEXTURES);
     RenderSystem.enableBlend();
 

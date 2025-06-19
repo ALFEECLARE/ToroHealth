@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -22,7 +24,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class RayTrace implements BlockGetter {
+public class RayTrace implements BlockGetter,LevelHeightAccessor {
   private static Predicate<Entity> isVisible =
       entity -> !entity.isSpectator() && entity.isPickable();
   private static Minecraft minecraft = Minecraft.getInstance();
@@ -110,7 +112,7 @@ public class RayTrace implements BlockGetter {
     }, (c) -> {
       Vec3 vec3 = c.getFrom().subtract(c.getTo());
       Vec3 toBlock = c.getTo();
-      return BlockHitResult.miss(c.getTo(), Direction.getNearest(vec3.x, vec3.y, vec3.z),
+      return BlockHitResult.miss(c.getTo(), Direction.getNearest(new Vec3i((int)vec3.x(),(int)vec3.y(),(int)vec3.z()), null),
           new BlockPos(Mth.floor(toBlock.x),Mth.floor(toBlock.y),Mth.floor(toBlock.z)));
     });
   }
@@ -121,7 +123,7 @@ public class RayTrace implements BlockGetter {
   }
 
   @Override
-  public int getMinBuildHeight() {
+  public int getMinY() {
     return 0;
   }
 }

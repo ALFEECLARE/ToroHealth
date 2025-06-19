@@ -5,7 +5,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -47,7 +48,7 @@ public class BarDisplay {
 		int xOffset = 0;
 		
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShader(CoreShaders.POSITION_TEX);
 		RenderSystem.setShaderTexture(0, ACTUAL_ARMOR_TEXTURES);
 		RenderSystem.enableBlend();
 
@@ -102,10 +103,10 @@ public class BarDisplay {
 	}
 
 	private void renderArmorIcon(GuiGraphics gui, int x, int y) {
-		gui.blitSprite(ARMOR_TEXTURES, x, y, 9, 9);
+		gui.blitSprite(RenderType.GUI_TEXTURED, ARMOR_TEXTURES, x, y, 9, 9);
 	}
 
 	private void renderHeartIcon(GuiGraphics gui, int x, int y) {
-		gui.blitSprite(HEART_TEXTURES, x, y, 9, 9);
+		gui.blitSprite(RenderType.GUI_TEXTURED, HEART_TEXTURES, x, y, 9, 9);
 	}
 }

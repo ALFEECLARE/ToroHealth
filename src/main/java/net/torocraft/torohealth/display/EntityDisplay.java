@@ -4,7 +4,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -124,8 +123,9 @@ public class EntityDisplay {
 	}
 	
 	entityrenderdispatcher.setRenderShadow(false);
-	RenderSystem.runAsFancy(() -> entityrenderdispatcher.render(pEntity, 0.0, 0.0, 0.0, 0.0F, 1.0F, pGuiGraphics.pose(), pGuiGraphics.bufferSource(), 15728880));
+	pGuiGraphics.drawSpecial(bufferSource -> entityrenderdispatcher.render(pEntity, 0.0, 0.0, 0.0, 1.0F, pGuiGraphics.pose(), bufferSource, 15728880));
 	pGuiGraphics.flush();
+	
 	entityrenderdispatcher.setRenderShadow(true);
 	Lighting.setupFor3DItems();
 	pEntity.yBodyRot = f4;

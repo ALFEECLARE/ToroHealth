@@ -8,6 +8,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -48,6 +49,11 @@ public class Hud implements LayeredDraw.Layer {
 
   public void render(GuiGraphics guigraphics, DeltaTracker delta) {
 	//gui.setTitle(Component.literal("ToroHealth HUD"));
+	if (this.minecraft == null) {
+		this.minecraft = Minecraft.getInstance();
+		return;
+	}
+	ToroHealth.log("hud started");
     if (this.minecraft.getDebugOverlay().showDebugScreen()) {
       return;
     }
@@ -183,7 +189,7 @@ public class Hud implements LayeredDraw.Layer {
   private void drawSkin(GuiGraphics gui) {
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     int w = 160, h = 60;
-    gui.blit(BACKGROUND_TEXTURE, 0, 0, 0.0f, 0.0f, w, h, w, h);
+    gui.blit(RenderType.GUI_TEXTURED,BACKGROUND_TEXTURE, 0, 0, 0.0f, 0.0f, w, h, w, h);
   }
   
   public void updateIgnoreList(String hudIgnoreString,String worldIgnoreString) {

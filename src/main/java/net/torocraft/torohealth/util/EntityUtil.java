@@ -9,6 +9,7 @@ import java.util.stream.StreamSupport;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
@@ -146,10 +147,15 @@ public class EntityUtil {
 	public static String getGortHornInstrumentName(Goat goatEntity) {
 		ItemStack hornStack = goatEntity.createHorn();
 		InstrumentItem hornItem = (InstrumentItem)hornStack.getItem();
-		Optional<ResourceKey<Instrument>> optional = hornItem.getInstrument(hornStack).flatMap(Holder::unwrapKey);
-		if (optional.isPresent()) {
-	         MutableComponent mutablecomponent = Component.translatable(Util.makeDescriptionId("instrument", optional.get().location()));
-	         return mutablecomponent.getString();
+		HolderLookup.Provider provider =  goatEntity.registryAccess();
+		if (provider != null) {
+			Optional<ResourceKey<Instrument>> optional = hornItem.getInstrument(hornStack, provider).flatMap(Holder::unwrapKey);
+			if (optional.isPresent()) {
+		         MutableComponent mutablecomponent = Component.translatable(Util.makeDescriptionId("instrument", optional.get().location()));
+		         return mutablecomponent.getString();
+			} else {
+				return "";
+			}
 		} else {
 			return "";
 		}

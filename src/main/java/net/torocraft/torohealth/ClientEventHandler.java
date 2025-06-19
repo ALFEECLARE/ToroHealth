@@ -1,18 +1,20 @@
 
 package net.torocraft.torohealth;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -27,8 +29,7 @@ public class ClientEventHandler {
 
   public static void init(IEventBus modEventBus, ModContainer modContainer) {
     NeoForge.EVENT_BUS.addListener(ClientEventHandler::playerTick);
-    NeoForge.EVENT_BUS.addListener(ClientEventHandler::entityRender);
-    NeoForge.EVENT_BUS.addListener(ClientEventHandler::renderParticles);
+    NeoForge.EVENT_BUS.addListener(ClientEventHandler::renderHud);
     modEventBus.addListener(ClientEventHandler::registerOverlays);
   }
 
@@ -37,14 +38,22 @@ public class ClientEventHandler {
   }
 
   @SubscribeEvent
-  private static void entityRender(
-          RenderLivingEvent.Post<? extends LivingEntity, ? extends EntityModel<?>> event) {
-    HealthBarRenderer.prepareRenderInWorld(event.getEntity());
-  }
-
-  @SubscribeEvent
-    private static void renderParticles(RenderLevelStageEvent event) {
-      if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
+    private static void renderHud(RenderLevelStageEvent event) {
+	  if (mc == null) {
+			mc = Minecraft.getInstance();
+		  	return;
+	  }
+		ToroHealth.log("renderHud started");
+	  RenderLevelStageEvent.Stage stage = event.getStage();
+	  if (stage == RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
+		List<Entity> shownEntities = new ArrayList<Entity>();
+		mc.levelRenderer.collectVisibleEntities(event.getCamera(), event.getFrustum(), shownEntities);
+		for (Entity entity : shownEntities) {
+			if (entity instanceof LivingEntity) {
+				HealthBarRenderer.prepareRenderInWorld((LivingEntity)entity);
+			}
+		}
+	  } else if (stage == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
         Camera camera = mc.gameRenderer.getMainCamera();
         GuiGraphics gui = new GuiGraphics(mc, mc.renderBuffers().bufferSource());
         gui.pose().mulPose(event.getPoseStack().last().pose());
@@ -55,6 +64,11 @@ public class ClientEventHandler {
 
   @SubscribeEvent
   private static void playerTick(PlayerTickEvent.Post event) {
+	  if (mc == null) {
+			mc = Minecraft.getInstance();
+		  	return;
+	  }
+	ToroHealth.log("player tick started");
     if (!event.getEntity().isLocalPlayer()) {
       return;
     }

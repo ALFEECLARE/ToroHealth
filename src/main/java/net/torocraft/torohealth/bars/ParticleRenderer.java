@@ -8,7 +8,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.torocraft.torohealth.ToroHealth;
@@ -30,7 +30,7 @@ public class ParticleRenderer {
     float scaleToGui = 0.025f;
 
     Minecraft client = Minecraft.getInstance();
-    float tickDelta = client.getTimer().getGameTimeDeltaTicks();
+    float tickDelta = client.getDeltaTracker().getGameTimeDeltaTicks();
 
     double x = Mth.lerp((double) tickDelta, particle.xPrev, particle.x);
     double y = Mth.lerp((double) tickDelta, particle.yPrev, particle.y);
@@ -47,7 +47,7 @@ public class ParticleRenderer {
     gui.pose().mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
     gui.pose().scale(-scaleToGui, -scaleToGui, scaleToGui);
 
-    RenderSystem.setShader(GameRenderer::getPositionColorShader);
+    RenderSystem.setShader(CoreShaders.POSITION_COLOR);
     RenderSystem.enableDepthTest();
     RenderSystem.enableBlend();
     RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE,
