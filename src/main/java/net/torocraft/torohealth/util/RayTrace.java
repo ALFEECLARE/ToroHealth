@@ -31,16 +31,27 @@ public class RayTrace implements BlockGetter,LevelHeightAccessor {
 
   @Override
   public BlockEntity getBlockEntity(BlockPos pos) {
+	  if (minecraft == null) {
+		  minecraft = Minecraft.getInstance();
+		  return null;
+	  }
     return minecraft.level.getBlockEntity(pos);
   }
 
   @Override
   public BlockState getBlockState(BlockPos pos) {
+	  if (minecraft == null) {
+		  minecraft = Minecraft.getInstance();
+	  }
     return minecraft.level.getBlockState(pos);
   }
 
   @Override
   public FluidState getFluidState(BlockPos pos) {
+	  if (minecraft == null) {
+		  minecraft = Minecraft.getInstance();
+		  return null;
+	  }
     return minecraft.level.getFluidState(pos);
   }
 

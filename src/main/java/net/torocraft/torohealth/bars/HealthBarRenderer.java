@@ -3,21 +3,16 @@ package net.torocraft.torohealth.bars;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,12 +25,22 @@ import net.torocraft.torohealth.config.Config.Mode;
 import net.torocraft.torohealth.display.Hud;
 import net.torocraft.torohealth.util.EntityUtil;
 import net.torocraft.torohealth.util.EntityUtil.Relation;
+import net.torocraft.torohealth.util.RenderUtils;
 
 public class HealthBarRenderer {
 
+  private static final ResourceLocation GUI_ENTITY_BAR_BACKGROUND_TEXTURE = ResourceLocation.parse(ToroHealth.MODID + ":textures/gui/bar_back_entity.png");
+  private static final ResourceLocation GUI_ENTITY_BAR_FRONT_TEXTURE = ResourceLocation.parse(ToroHealth.MODID + ":textures/gui/bar_front_entity.png");
+  private static final ResourceLocation GUI_WORLD_BAR_BACKGROUND_TEXTURE = ResourceLocation.parse(ToroHealth.MODID + ":textures/gui/bar_back_world.png");
+  private static final ResourceLocation GUI_WORLD_BAR_FRONT_TEXTURE = ResourceLocation.parse(ToroHealth.MODID + ":textures/gui/bar_front_world.png");
   private static final ResourceLocation GUI_BARS_TEXTURES = ResourceLocation.parse(ToroHealth.MODID + ":textures/gui/bars.png");
-  private static final int DARK_GRAY = 0x808080;
-  private static final float FULL_SIZE = 40;
+  private static final int DARK_GRAY = 0xff808080;
+  private static final int FULL_SIZE = 40;
+  private static final int BAR_HEIGHT_IN_WORLD = 4;
+  private static final int SOURCE_TEXTURE_WHOLE_WIDTH = 256;
+  private static final int SOURCE_TEXTURE_WHOLE_HEIGHT = 256;
+  private static final int SOURCE_TEXTURE_WIDTH = 92;
+  private static final int SOURCE_TEXTURE_HEIGHT = 5;
 
   private static InWorld getConfig() {
     return ToroHealth.CONFIG.inWorld;
@@ -97,45 +102,42 @@ public class HealthBarRenderer {
       return;
     }
 
-    RenderSystem.setShader(CoreShaders.POSITION_COLOR);
-    RenderSystem.enableDepthTest();
-    RenderSystem.enableBlend();
-    RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE,
-        GL11.GL_ZERO);
+	RenderPipeline usingPipeLine = RenderUtils.buildEntityPipeline("world_health_bar_render");
+    RenderSystem.AutoStorageIndexBuffer asBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
 
     for (LivingEntity entity : renderedEntities) {
-      float scaleToGui = 0.025f;
-      boolean sneaking = entity.isCrouching();
-      float height = entity.getBbHeight() + 0.6F - (sneaking ? 0.25F : 0.0F);
+        float scaleToGui = 0.025f;
+        boolean sneaking = entity.isCrouching();
+        float height = entity.getBbHeight() + 0.6F - (sneaking ? 0.25F : 0.0F);
 
-      double x = Mth.lerp((double) partialTick, entity.xo, entity.getX());
-      double y = Mth.lerp((double) partialTick, entity.yo, entity.getY());
-      double z = Mth.lerp((double) partialTick, entity.zo, entity.getZ());
+        double x = Mth.lerp((double) partialTick, entity.xo, entity.getX());
+        double y = Mth.lerp((double) partialTick, entity.yo, entity.getY());
+        double z = Mth.lerp((double) partialTick, entity.zo, entity.getZ());
 
-      Vec3 camPos = camera.getPosition();
-      double camX = camPos.x();
-      double camY = camPos.y();
-      double camZ = camPos.z();
+        Vec3 camPos = camera.getPosition();
+        double camX = camPos.x();
+        double camY = camPos.y();
+        double camZ = camPos.z();
 
-      gui.pose().pushPose();
-      gui.pose().translate(x - camX, (y + height) - camY, z - camZ);
-      gui.pose().mulPose(Axis.YP.rotationDegrees(-camera.getYRot()));
-      gui.pose().mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
-      gui.pose().scale(-scaleToGui, -scaleToGui, scaleToGui);
+        gui.pose().pushPose();
+        gui.pose().translate(x - camX, (y + height) - camY, z - camZ);
+        gui.pose().mulPose(Axis.YP.rotationDegrees(-camera.getYRot()));
+        gui.pose().mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
+        gui.pose().scale(-scaleToGui, -scaleToGui, scaleToGui);
 
-      render(gui, entity, 0, 0, FULL_SIZE, true);
+        render(gui, entity, -10, 0, FULL_SIZE, BAR_HEIGHT_IN_WORLD, true);
 
-      gui.pose().popPose();
-      gui.flush();
+        gui.pose().popPose();
+        gui.flush();
     }
-
-    RenderSystem.disableBlend();
+    //RenderSystem.disableBlend();
+  	RenderUtils.renderIfExists(usingPipeLine,asBuffer,24 * DefaultVertexFormat.POSITION_TEX.getVertexSize());
 
     renderedEntities.clear();
   }
 
   public static void render(GuiGraphics gui, LivingEntity entity, double x, double y,
-      float width, boolean inWorld) {
+      int width,int height , boolean inWorld) {
 
     Relation relation = EntityUtil.determineRelation(entity);
 
@@ -150,20 +152,27 @@ public class HealthBarRenderer {
     float percent2 = Math.min(state.previousHealthDisplay, entity.getMaxHealth()) / entity.getMaxHealth();
     int zOffset = 0;
 
-    Matrix4f m4f = gui.pose().last().pose();
-    drawBar(m4f, x, y, width, 1, DARK_GRAY, zOffset++, inWorld);
-    drawBar(m4f, x, y, width, percent2, color2, zOffset++, inWorld);
-    drawBar(m4f, x, y, width, percent, color, zOffset, inWorld);
+    //Matrix4f m4f = gui.pose().last().pose();
+
+    gui.pose().pushPose();
+    gui.pose().scale(RenderUtils.getScaleValue(SOURCE_TEXTURE_WIDTH,width), RenderUtils.getScaleValue(SOURCE_TEXTURE_HEIGHT, height), 0f);
+    drawBar(gui, (int)x, (int)y, 1       , DARK_GRAY, width, height, zOffset++, inWorld);
+    drawBar(gui, (int)x, (int)y, percent2, color2   , width, height, zOffset++, inWorld);
+    drawBar(gui, (int)x, (int)y, percent , color    , width, height, zOffset  , inWorld);
+    gui.pose().popPose();
+    
     gui.flush();
 
-    if (!inWorld) {
+    if (inWorld) {
       if (ToroHealth.CONFIG.bar.damageNumberType.equals(Config.NumberType.CUMULATIVE)) {
         drawDamageNumber(gui, state.lastDmgCumulative, x, y, width);
       } else if (ToroHealth.CONFIG.bar.damageNumberType.equals(Config.NumberType.LAST)) {
         drawDamageNumber(gui, state.lastDmg, x, y, width);
       }
     }
-  }
+
+
+}
 
   public static void drawDamageNumber(GuiGraphics gui, int dmg, double x, double y,
       float width) {
@@ -179,39 +188,14 @@ public class HealthBarRenderer {
     gui.flush();
   }
 
-  private static void drawBar(Matrix4f matrix4f, double x, double y, float width, float percent,
-      int color, int zOffset, boolean inWorld) {
-    float c = 0.00390625F;
-    int u = 0;
-    int v = 6 * 5 * 2 + 5;
-    int uw = Mth.ceil(92 * percent);
-    int vh = 5;
+  private static void drawBar(GuiGraphics gui, int x, int y, float percent, int color, int drawWidth, int drawHeight,int zOffset, boolean isHorizontalCentered) {
+	int barIndex = 13;
 
-    double size = percent * width;
-    double h = inWorld ? 4 : 6;
+	int drawX = x - (drawWidth) / 2;
+	int drawY = y;
+	int sourceWidth = (int)(SOURCE_TEXTURE_WIDTH * percent);
 
-    float r = (color >> 16 & 255) / 255.0F;
-    float g = (color >> 8 & 255) / 255.0F;
-    float b = (color & 255) / 255.0F;
-
-    RenderSystem.setShaderColor(r, g, b, 1);
-    RenderSystem.setShader(CoreShaders.POSITION_TEX);
-    RenderSystem.setShaderTexture(0, GUI_BARS_TEXTURES);
-    RenderSystem.enableBlend();
-
-    float half = width / 2;
-
-    float zOffsetAmount = inWorld ? -0.1F : 0.1F;
-
-    Tesselator tessellator = Tesselator.getInstance();
-    BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-
-    buffer.addVertex(matrix4f, (float) (-half + x), (float) y, zOffset * zOffsetAmount).setUv(u * c, v * c);
-    buffer.addVertex(matrix4f, (float) (-half + x), (float) (h + y), zOffset * zOffsetAmount).setUv(u * c, (v + vh) * c);
-    buffer.addVertex(matrix4f, (float) (-half + size + x), (float) (h + y), zOffset * zOffsetAmount).setUv((u + uw) * c, (v + vh) * c);
-    buffer.addVertex(matrix4f, (float) (-half + size + x), (float) y, zOffset * zOffsetAmount).setUv(((u + uw) * c), v * c);
-    BufferUploader.drawWithShader(buffer.buildOrThrow());
-    RenderSystem.setShaderColor(1, 1, 1, 1);
-    RenderSystem.disableBlend();
+    gui.blit(RenderType.GUI_TEXTURED, GUI_BARS_TEXTURES, drawX, drawY, 0f, SOURCE_TEXTURE_HEIGHT * barIndex, sourceWidth, SOURCE_TEXTURE_HEIGHT, SOURCE_TEXTURE_WHOLE_WIDTH, SOURCE_TEXTURE_WHOLE_HEIGHT, color);
+     RenderSystem.setShaderColor(1, 1, 1, 1);
   }
 }

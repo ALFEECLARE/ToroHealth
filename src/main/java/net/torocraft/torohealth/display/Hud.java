@@ -53,7 +53,6 @@ public class Hud implements LayeredDraw.Layer {
 		this.minecraft = Minecraft.getInstance();
 		return;
 	}
-	ToroHealth.log("hud started");
     if (this.minecraft.getDebugOverlay().showDebugScreen()) {
       return;
     }

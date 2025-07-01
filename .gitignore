@@ -36,7 +36,4 @@ logs
 /native/*
 /wrapper/*
 /.tmp/*
-/caches/
-/daemon/
-/native/
-/wrapper/
+/workers/

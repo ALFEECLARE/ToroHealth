@@ -10,6 +10,7 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
@@ -22,12 +23,12 @@ import net.minecraft.world.entity.animal.AbstractFish;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Panda;
 import net.minecraft.world.entity.animal.Squid;
-import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.animal.camel.Camel;
 import net.minecraft.world.entity.animal.goat.Goat;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraft.world.entity.animal.horse.SkeletonHorse;
+import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Ghast;
@@ -64,7 +65,7 @@ public class EntityUtil {
     return entity instanceof LivingEntity && !(entity instanceof ArmorStand)
         && (!entity.isInvisibleTo(client.player) || entity.isCurrentlyGlowing() || entity.isOnFire()
             || entity instanceof Creeper && ((Creeper) entity).isPowered()
-            || StreamSupport.stream(entity.getAllSlots().spliterator(), false)
+            || StreamSupport.stream(entity.equipment.items.values().spliterator(), false)
                 .anyMatch(is -> !is.isEmpty()))
         && entity != client.player && !entity.isSpectator();
   }
@@ -80,7 +81,7 @@ public class EntityUtil {
 			answer.addAll(getHorseExtraData(horseEntity));
 		}
 		if (entity instanceof Villager) {
-			answer.add(Component.translatable("net.torocraft.torohealth.label.biome").getString() + " : " + Component.translatable("biome.minecraft." + ((Villager)entity).getVillagerData().getType().toString()).getString());
+			answer.add(Component.translatable("net.torocraft.torohealth.label.biome").getString() + " : " + Component.translatable("biome.minecraft." + ((Villager)entity).getVillagerData().type().getKey().location().getPath()).getString());
 		}
 		switch(entity.getClass().getName()) {
 			case "":
@@ -95,11 +96,13 @@ public class EntityUtil {
 				answer.add(Component.translatable("net.torocraft.torohealth.panda.hiddengene").getString() + " : " + Component.translatable("net.torocraft.torohealth.panda.gene." + pandaEntity.getHiddenGene().name()).getString());
 				answer.add(Component.translatable("net.torocraft.torohealth.panda.finallygene").getString() + " : " + Component.translatable("net.torocraft.torohealth.panda.gene." + pandaEntity.getVariant().name()).getString());
 				break;
-			case "net.minecraft.world.entity.animal.Wolf":
+			case "net.minecraft.world.entity.animal.wolf.Wolf":
 				Wolf wolfEntity = (Wolf)entity;
-				answer.add(Component.translatable("net.torocraft.torohealth.label.variant").getString() + " : " + Component.translatable("net.torocraft.torohealth.wolf.variant." + wolfEntity.getVariant().unwrapKey().get().location().getPath()).getString());
+				answer.add(Component.translatable("net.torocraft.torohealth.label.variant").getString() + " : " + Component.translatable("net.torocraft.torohealth.wolf.variant." + wolfEntity.get(DataComponents.WOLF_VARIANT).unwrapKey().get().location().getPath()).getString());
 				break;
 			default:
+				//テスト用
+				//answer.add(entity.getClass().getName());
 				break;
 		}
 		return answer;
