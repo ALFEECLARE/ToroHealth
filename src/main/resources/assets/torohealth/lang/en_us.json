@@ -45,7 +45,12 @@
   "net.torocraft.torohealth.wolf.variant.woods": "Woods(Forest)",
   "net.torocraft.torohealth.wolf.variant.chestnut": "Chestnut(Old Growth Spruce Taiga)",
   "net.torocraft.torohealth.wolf.variant.striped": "Striped(Wooded Badlands)",
+  "net.torocraft.torohealth.villager.Profession.child": "Child" ,
+  "net.torocraft.torohealth.villager.Profession.none" : "Unemployed" ,
+  "net.torocraft.torohealth.villager.Profession.nitwit": "Nitwit",
 
   "net.torocraft.torohealth.label.biome": "Biome",
-  "net.torocraft.torohealth.label.variant": "Variants"
+  "net.torocraft.torohealth.label.variant": "Variants",
+  "net.torocraft.torohealth.label.villagerProfession": "Profession",
+  "net.torocraft.torohealth.label.modName": "MOD"
 }

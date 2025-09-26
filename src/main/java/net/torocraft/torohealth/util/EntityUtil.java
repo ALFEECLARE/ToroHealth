@@ -10,11 +10,14 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ambient.AmbientCreature;
@@ -34,6 +37,7 @@ import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Instrument;
 import net.minecraft.world.item.InstrumentItem;
 import net.minecraft.world.item.ItemStack;
@@ -79,8 +83,9 @@ public class EntityUtil {
 			AbstractHorse horseEntity = (AbstractHorse)entity;
 			answer.addAll(getHorseExtraData(horseEntity));
 		}
-		if (entity instanceof Villager) {
-			answer.add(Component.translatable("net.torocraft.torohealth.label.biome").getString() + " : " + Component.translatable("biome.minecraft." + ((Villager)entity).getVillagerData().getType().toString()).getString());
+		if (entity instanceof Villager villager) {
+			answer.add(Component.translatable("net.torocraft.torohealth.label.biome").getString() + " : " + Component.translatable("biome.minecraft." + villager.getVillagerData().getType().toString()).getString());
+			answer.add(Component.translatable("net.torocraft.torohealth.label.villagerProfession").getString() + " : " + Component.translatable(getProfessionTextKey(villager)).getString());
 		}
 		switch(entity.getClass().getName()) {
 			case "":
@@ -101,6 +106,12 @@ public class EntityUtil {
 				break;
 			default:
 				break;
+		}
+		if (ToroHealth.CONFIG.hud.showFromMod) {
+			String fromModName = EntityType.getKey(entity.getType()).getNamespace(); 
+			if (!"minecraft".equals(fromModName)) {
+				answer.add(Component.translatable("net.torocraft.torohealth.label.modName").getString() + " : " + fromModName);
+			}
 		}
 		return answer;
 	}
@@ -165,4 +176,13 @@ public class EntityUtil {
 		return Arrays.asList(entityKeyString.split(","));
 	}
 	
+	private static String getProfessionTextKey(Villager villager) {
+		VillagerProfession profession = villager.getVillagerData().getProfession();
+		if (villager.isBaby())                       {return "net.torocraft.torohealth.villager.Profession.child";}
+		if (profession.equals(VillagerProfession.NONE)) {return "net.torocraft.torohealth.villager.Profession.none";}
+		if (profession.equals(VillagerProfession.NITWIT)) {return "net.torocraft.torohealth.villager.Profession.nitwit";}
+
+		ResourceLocation profName = BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession);
+        return villager.getType().getDescriptionId() + '.' + (!"minecraft".equals(profName.getNamespace()) ? profName.getNamespace() + '.' : "") + profName.getPath();
+	}
 }

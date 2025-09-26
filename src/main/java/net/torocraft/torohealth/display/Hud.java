@@ -53,7 +53,7 @@ public class Hud implements LayeredDraw.Layer {
 		this.minecraft = Minecraft.getInstance();
 		return;
 	}
-	ToroHealth.log("hud started");
+
     if (this.minecraft.getDebugOverlay().showDebugScreen()) {
       return;
     }
@@ -121,7 +121,7 @@ public class Hud implements LayeredDraw.Layer {
 
   private void setEntityWork(LivingEntity entity) {
     this.entity = entity;
-    entityDisplay.setEntity(entity);
+    entityDisplay.setEntity(entity, config.hud.scale);
   }
 
   public LivingEntity getEntity() {
