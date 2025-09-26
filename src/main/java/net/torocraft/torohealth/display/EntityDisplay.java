@@ -19,8 +19,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 
 public class EntityDisplay {
-	private static final float RENDER_HEIGHT = 30;
-	private static final float RENDER_WIDTH = 18;
+	private static final float RENDER_HEIGHT = 20;
+	private static final float RENDER_WIDTH = 20;
 	private static final float WIDTH = 40;
 	private static final float HEIGHT = WIDTH;
 
@@ -31,9 +31,9 @@ public class EntityDisplay {
 	private float xOffset;
 	private float yOffset;
 
-	public void setEntity(LivingEntity entity) {
+	public void setEntity(LivingEntity entity, float renderScale) {
 		this.entity = entity;
-		updateScale();
+		updateScale(renderScale);
 	}
 
 	public void setBlock(BlockEntity block) {
@@ -58,14 +58,14 @@ public class EntityDisplay {
 		}
 	}
 
-  private void updateScale() {
+  private void updateScale(float renderScale) {
     if (entity == null) {
       return;
     }
 
-    float scaleY = RENDER_HEIGHT / Math.max(entity.getBbHeight(),entity.getBbWidth());
-    float scaleX = RENDER_WIDTH / Math.max(entity.getBbHeight(),entity.getBbWidth());
-    entityScale = Math.min(scaleX, scaleY);
+    float scaleY = RENDER_HEIGHT / (entity.getBbHeight() * 16);
+    float scaleX = RENDER_WIDTH / (entity.getBbWidth() * 16);
+    entityScale = Math.min(scaleX, scaleY) * 16;
 
     entityScale *= (float)switch (entity) {
     	case IronGolem ironGolem                          -> 1.2;
@@ -74,19 +74,20 @@ public class EntityDisplay {
     	default                                           -> 1;
     };
 
-    xOffset = (WIDTH) / 2;
-    xOffset += switch (entity) {
-    	case Villager villager when villager.isSleeping() -> -3;
+    xOffset = (WIDTH - RENDER_WIDTH) + switch (entity) {
+		case Villager villager   -> -3;
+		case IronGolem ironGolem -> -3;
 		default                                            -> 0;
     };
+	xOffset = xOffset / renderScale + (RENDER_WIDTH - entity.getBbWidth() * entityScale) / 2;
 
-    yOffset = (HEIGHT + RENDER_HEIGHT) / 2;
-    yOffset -= switch (entity) {
+    yOffset = (15 + HEIGHT - RENDER_HEIGHT) - switch (entity) {
     	case Ghast ghast                                  -> 10;
     	case Turtle turtle                                -> 3;
     	case Villager villager when villager.isSleeping() -> 15;
     	default                                           -> 0;
     };
+	yOffset = yOffset / renderScale + (RENDER_HEIGHT - entity.getBbHeight() * entityScale) / 2;
   }
 
   /**
@@ -109,7 +110,7 @@ public class EntityDisplay {
 	pGuiGraphics.pose().pushPose();
 	pGuiGraphics.pose().translate((double)pX * pScale, (double)pY * pScale, (double)1050.0 * pScale);
 	pGuiGraphics.pose().scale(1, 1, -1);
-	Vector3f pTranslate = new Vector3f(0.0F, 0.0F, 1000.0F);
+	Vector3f pTranslate = new Vector3f(0.0F, 0.0F, 0.0F);
 	pGuiGraphics.pose().translate(pTranslate.x, pTranslate.y, pTranslate.z);
 	pGuiGraphics.pose().scale(pSize * 1.25f, pSize * 1.25f, pSize * 1.25f);
 	Quaternionf pPose = new Quaternionf().rotateZ(180.0F * (float) (Math.PI / 180.0)); 

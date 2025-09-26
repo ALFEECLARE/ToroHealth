@@ -45,7 +45,12 @@
   "net.torocraft.torohealth.wolf.variant.woods": "森(森林)",
   "net.torocraft.torohealth.wolf.variant.chestnut": "栗色(トウヒの原生林)",
   "net.torocraft.torohealth.wolf.variant.striped": "シマ(森のある荒野)",
+  "net.torocraft.torohealth.villager.Profession.child": "子供" ,
+  "net.torocraft.torohealth.villager.Profession.none" : "求職者" ,
+  "net.torocraft.torohealth.villager.Profession.nitwit": "無職",
 
   "net.torocraft.torohealth.label.biome": "バイオーム" ,
-  "net.torocraft.torohealth.label.variant": "種類"
+  "net.torocraft.torohealth.label.variant": "種類",
+  "net.torocraft.torohealth.label.villagerProfession": "職業",
+  "net.torocraft.torohealth.label.modName": "MOD"
 }

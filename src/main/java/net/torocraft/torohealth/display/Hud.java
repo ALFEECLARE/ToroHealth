@@ -120,7 +120,7 @@ public class Hud implements LayeredDraw.Layer {
 
   private void setEntityWork(LivingEntity entity) {
     this.entity = entity;
-    entityDisplay.setEntity(entity);
+    entityDisplay.setEntity(entity, config.hud.scale);
   }
 
   public LivingEntity getEntity() {
