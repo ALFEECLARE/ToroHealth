@@ -43,7 +43,6 @@ public class ClientEventHandler {
 			mc = Minecraft.getInstance();
 		  	return;
 	  }
-		ToroHealth.log("renderHud started");
 	  RenderLevelStageEvent.Stage stage = event.getStage();
 	  if (stage == RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
 		List<Entity> shownEntities = new ArrayList<Entity>();
@@ -68,7 +67,6 @@ public class ClientEventHandler {
 			mc = Minecraft.getInstance();
 		  	return;
 	  }
-	ToroHealth.log("player tick started");
     if (!event.getEntity().isLocalPlayer()) {
       return;
     }
